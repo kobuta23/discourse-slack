@@ -46,7 +46,7 @@ app.post('/webhook/discourse', async (req, res) => {
     res.status(200).json({ status: 'success' });
   } catch (error) {
     logger.error('Error processing webhook', { error: error.message });
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 });
 
@@ -117,6 +117,27 @@ const sendToSlack = async (message) => {
     throw error;
   }
 };
+
+// Add this new endpoint
+app.get('/logs', (req, res) => {
+  const options = {
+    from: new Date - 24 * 60 * 60 * 1000,  // last 24 hours
+    until: new Date,
+    limit: 100,
+    start: 0,
+    order: 'desc'
+  };
+
+  // Read from the combined.log file
+  const transport = new winston.transports.File({ filename: 'combined.log' });
+  transport.query(options, (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Error fetching logs' });
+      return;
+    }
+    res.json(results);
+  });
+});
 
 // Start server
 app.listen(port, () => {
