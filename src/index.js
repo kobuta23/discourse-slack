@@ -26,25 +26,13 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 
-// Validate Discourse webhook secret
-const validateDiscourseWebhook = (req, res, next) => {
-  const discourseSecret = process.env.DISCOURSE_SECRET;
-  const requestSecret = req.headers['x-discourse-event-signature'];
-
-  if (!discourseSecret || !requestSecret || requestSecret !== discourseSecret) {
-    logger.error('Invalid webhook secret');
-    return res.status(401).json({ error: 'Invalid webhook secret' });
-  }
-  next();
-};
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });
 });
 
-// Discourse webhook endpoint
-app.post('/webhook/discourse', validateDiscourseWebhook, async (req, res) => {
+// Discourse webhook endpoint - no validation
+app.post('/webhook/discourse', async (req, res) => {
   try {
     const payload = req.body;
     logger.info('Received webhook from Discourse', { payload });
