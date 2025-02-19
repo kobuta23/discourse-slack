@@ -53,7 +53,7 @@ app.post('/webhook/discourse', async (req, res) => {
 // Format message for Slack
 const formatSlackMessage = (payload) => {
   const post = payload.post;
-  const avatarUrl = post.avatar_template.replace('{size}', '48');
+  const avatarUrl = "https://forum.superfluid.org" + post.avatar_template.replace('{size}', '48');
   
   return {
     blocks: [
