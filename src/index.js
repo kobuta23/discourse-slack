@@ -55,13 +55,17 @@ const formatSlackMessage = (payload) => {
   const post = payload.post;
   const avatarUrl = "https://forum.superfluid.org" + post.avatar_template.replace('{size}', '48');
   
+  // Check if this is a new topic or a reply
+  const isNewTopic = post.post_number === 1;
+  const headerText = isNewTopic ? "🆕 New Topic" : "💬 New Reply";
+  
   return {
     blocks: [
       {
         type: "header",
         text: {
           type: "plain_text",
-          text: post.topic_title || "New Discourse Post"
+          text: `${headerText}: ${post.topic_title || "Untitled"}`
         }
       },
       {
@@ -88,7 +92,7 @@ const formatSlackMessage = (payload) => {
         elements: [
           {
             type: "mrkdwn",
-            text: `<${process.env.DISCOURSE_URL || ''}${post.post_url}|View on Discourse> • ${new Date(post.created_at).toLocaleString()} • Post #${post.post_number}`
+            text: `${isNewTopic ? '📌 New Topic • ' : '↪️ Reply • '}<${process.env.DISCOURSE_URL || ''}${post.post_url}|View on Discourse> • ${new Date(post.created_at).toLocaleString()} • Post #${post.post_number}`
           }
         ]
       }
