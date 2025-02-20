@@ -38,6 +38,8 @@ app.post('/webhook/discourse', async (req, res) => {
     logger.info('Received webhook from Discourse', { payload });
 
     // Format message for Slack
+    if(payload.post.topic_title.includes("Greetings!")) return;
+    
     const message = formatSlackMessage(payload);
 
     // Send to Slack
@@ -58,7 +60,7 @@ const formatSlackMessage = (payload) => {
   // Check if this is a new topic or a reply
   const isNewTopic = post.post_number === 1;
   const headerText = isNewTopic ? "🆕 New Topic" : "💬 New Reply";
-  
+
   return {
     blocks: [
       {
